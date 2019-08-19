@@ -1,0 +1,73 @@
+title: House
+views:
+    # View tab title.
+  - title: House
+    # Optional unique id for direct access /lovelace/${id}
+    id: poolview
+    # Each view can have a different theme applied.
+    theme: dark-mode
+    cards:
+        # Entities card will take list of entities and show their state.
+      - type: entities
+        # Title of the entities card
+        title: Indoor lights
+        show_header_toggle: True
+        # The entities here will be shown in the same order as specified.
+        # Each entriy is an entity ID or a map with extra options.
+        entities:
+          - light.family_room
+          - light.kitchen_lights
+          - light.kitchen_table
+      - type: entities
+        # Title of the entities card
+        title: Outdoor lights
+        show_header_toggle: False
+        # The entities here will be shown in the same order as specified.
+        # Each entriy is an entity ID or a map with extra options.
+        entities:
+          - light.post_light
+          - light.front_of_garage_lights
+      - type: entities
+        # Title of the entities card
+        title: Garage
+        show_header_toggle: False
+        # The entities here will be shown in the same order as specified.
+        # Each entriy is an entity ID or a map with extra options.
+        entities:
+          - cover.car
+          - cover.van
+      - type: entities
+        # Title of the entities card
+        title: House
+        show_header_toggle: False
+        # The entities here will be shown in the same order as specified.
+        # Each entriy is an entity ID or a map with extra options.
+        entities:
+          - climate.home
+      - type: history-graph
+        title: 'House Temperature'
+        hours_to_show: 48 
+        refresh_interval: 5
+        entities:
+          - sensor.home_humidity
+          - sensor.house_humidex
+#          - sensor.home_temperature
+#          - sensor.house_temperature
+          - climate.home
+      - type: history-graph
+        title: 'Outdoor Temperature'
+        hours_to_show: 48 
+        refresh_interval: 5
+        entities:
+          - sensor.outdoor_temperature
+      - type: history-graph
+        title: 'System History'
+        hours_to_show: 48 
+        refresh_interval: 5
+        entities:
+          - sensor.furnace_fan
+          - sensor.furnace_status
+         
+          
+          
+    

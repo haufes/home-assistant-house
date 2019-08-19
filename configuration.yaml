@@ -1,0 +1,159 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: House
+  # Location required to calculate the time the sun rises and sets
+  latitude: 45.325
+  longitude: -75.9116  
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 76
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: America/Toronto
+  # Customization file
+  customize: !include customize.yaml
+
+
+# Enables the frontend
+frontend:
+
+#logger:
+#  default: debug
+
+# Enables configuration UI
+config:
+
+http:
+  # Secrets are defined in the file secrets.yaml
+  # api_password: !secret http_password
+  # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+  # base_url: example.duckdns.org:8123
+  server_port: 80
+
+
+# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+# http:
+#   base_url: example.duckdns.org:8123
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  # include_used_components: true
+
+# Discover some devices automatically
+discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+# Enables support for tracking state changes over time
+history:
+ #   exclude:
+ #       entities:
+ #           -  sensor.ultrasonic            
+# View all events in a logbook
+logbook:
+    exclude:
+        entities:
+            climate.home
+
+# Enables a map showing the location of tracked devices
+#map:
+
+# Track the sun
+sun:
+
+# Allow diagnosing system problems
+system_health:
+
+lovelace:
+  mode: yaml
+
+# Sensors
+sensor:
+#  - platform: command_line
+#    name: Ultrasonic
+#    command: "/usr/bin/python /mnt/usbdrive/home-assistant/ultrasonic_distance.py"
+#    scan_interval: 20
+#    unit_of_measurement: "cm"      
+#    value_template: '{{ value_json.left_sensor, value_json.right_sensor  }}'
+#    json_attributes:
+#    - left_sensor
+#    - right_sensor
+
+  - platform: template
+    sensors:
+      furnace_fan: 
+        friendly_name: "Furnace Fan"
+        value_template: "{{state_attr('climate.home', 'fan')}}"
+      furnace_status:
+        friendly_name: "Furnace"
+        value_template: >-
+           {% if ( ( state_attr('climate.home', 'equipment_running').find('Cool')) > 0) %}
+            cool
+           {% elif ( ( state_attr('climate.home', 'equipment_running').find('Heat')) > 0) %}
+            heat
+           {% else %}
+            off
+           {% endif %}        
+      house_humidex: 
+        friendly_name: "House Humidex"
+        value_template: "{{float(states('sensor.home_temperature')) + (0.5555)*(6.112*10**(7.5*float(state_attr('climate.home', 'current_temperature'))/(237.7+float(states('sensor.home_temperature'))))*float(state_attr('climate.home', 'current_humidity'))/100 - 10.0)}}"     
+        unit_of_measurement: °C
+        device_class: temperature
+        
+ # - platform: onewire
+ #   names:
+ #     28-0517c47cf8ff: Air
+          
+  - platform: rest          
+    resource: http://pool/api/states/sensor.air_temperature
+    value_template: '{{ value_json.state }}'
+    name: Outdoor Temperature
+    unit_of_measurement: °C
+    device_class: temperature
+    headers: 
+        Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhM2JlNjcyMDk5NDI0Y2QwODJjYzg0ZGUxZDg0NjM4NSIsImlhdCI6MTU2NDY5ODQ5MywiZXhwIjoxODgwMDU4NDkzfQ.TlQh1DFci0YY_uzvluT6EUma81XRbKQqEeu-68UOfU4
+          
+cover:
+  - platform: myq
+    username: !secret myq_account
+    password: !secret myq_account_password
+    type: liftmaster
+          
+switch:
+  - platform: rpi_gpio
+    ports:
+      17: Test
+    invert_logic: true          
+
+light:
+  - platform: decora_wifi
+    username: !secret decora_wifi_account
+    password: !secret decora_wifi_account_password
+    
+ecobee:
+  api_key: !secret ecobee_key
+
+# Text to speech
+tts:
+  - platform: google_translate
+    service_name: google_say
+
+# Cloud
+cloud:
+
+
+ifttt:
+  key:  !secret ifttt_key
+
+group: !include groups.yaml
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+
+

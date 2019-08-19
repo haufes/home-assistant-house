@@ -1,0 +1,24 @@
+- alias: Switch off
+  trigger:
+    platform: state
+    entity_id: switch.test
+    from: "on"
+    to: "off"
+  action:
+    service: python_script.set_state
+    data_template:
+      entity_id: sensor.air_temperature
+      data: '{"scan_interval":"999999"}'
+  
+- alias: Switch on
+  trigger:
+    platform: state
+    entity_id: switch.test
+    from: "off"
+    to: "on"
+  action:
+    service: python_script.set_state
+    data_template:
+      entity_id: sensor.air_temperature
+      data: '{"scan_interval":"60"}'
+          
